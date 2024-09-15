@@ -1,73 +1,56 @@
 #!/usr/bin/python3
-""" N QUEENS ALGORITHM WITH BACKTRACKING (RECURSION INSIDE LOOP) """
+"""Solving the N Queens problem"""
 import sys
 
 
-class NQueen:
-    """ Class for solving N Queen Problem """
-
-    def __init__(self, n):
-        """ Global Variables """
-        self.n = n
-        self.x = [0 for i in range(n + 1)]
-        self.res = []
-
-    def place(self, k, i):
-        """ Checks if k Queen can be placed in i column (True)
-        or if the are attacking queens in row or diagonal (False)
-        """
-
-        # j checks from 1 to k - 1 (Up to previous queen)
-        for j in range(1, k):
-            # There is already a queen in column
-            # or a queen in same diagonal
-            if self.x[j] == i or \
-               abs(self.x[j] - i) == abs(j - k):
-                return 0
-        return 1
-
-    def nQueen(self, k):
-        """ Tries to place every queen in the board
-        Args:
-        k: starting queen from which to evaluate (should be 1)
-        """
-        # i goes from column 1 to column n (1st column is 1st index)
-        for i in range(1, self.n + 1):
-            if self.place(k, i):
-                # Queen can be placed in i column
-                self.x[k] = i
-                if k == self.n:
-                    # Placed all 4 Queens (A solution was found)
-                    solution = []
-                    for i in range(1, self.n + 1):
-                        solution.append([i - 1, self.x[i] - 1])
-                    self.res.append(solution)
-                else:
-                    # Need to place more Queens
-                    self.nQueen(k + 1)
-        return self.res
+def check_here(nlist, index, curr_num):
+    for item in nlist:
+        if index == item[1] or\
+                index == item[1] - (curr_num - item[0]) or\
+                index == item[1] + (curr_num - item[0]):
+            return 1
+    return list([curr_num, index])
 
 
-# Main
+def loop_n_find(nlist, curr_num, layout):
+    if (curr_num > layout):
+        return
 
-if len(sys.argv) != 2:
-    print("Usage: nqueens N")
-    sys.exit(1)
+    if len(nlist) == layout:
+        print(nlist)
+        return
 
-N = sys.argv[1]
+    j = 0
+    while j < layout:
+        val = check_here(nlist, j, curr_num)
+        if type(val) is list:
+            new_nlist = nlist.copy()
+            new_nlist.append(val)
+            loop_n_find(new_nlist, curr_num + 1, layout)
+        j += 1
+    return
 
-try:
-    N = int(N)
-except ValueError:
-    print("N must be a number")
-    sys.exit(1)
 
-if N < 4:
-    print("N must be at least 4")
-    sys.exit(1)
+def solve_nqueens(layout):
+    for i in range(layout):
+        arr = [[0, i]]
+        loop_n_find(arr, 1, layout)
 
-queen = NQueen(N)
-res = queen.nQueen(1)
 
-for i in res:
-    print(i)
+if __name__ == "__main__":
+    args = sys.argv
+
+    if len(args) != 2:
+        print("Usage: nqueens N")
+        sys.exit(1)
+
+    if not args[1].isdigit():
+        print("N must be a number")
+        sys.exit(1)
+
+    layout = int(args[1])
+    if layout < 4:
+        print("N must be at least 4")
+        sys.exit(1)
+
+    solve_nqueens(layout)
